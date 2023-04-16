@@ -3,6 +3,16 @@ const router = require("express").Router();
 const User = require("../models/users");
 const PasswordField = require("../models/password");
 const { log } = require("console");
+
+// generating password
+router.get("/gen", async (req, res) => {
+  var password = generator.generate({
+    length: 36,
+    numbers: true,
+  });
+  res.status(200).json({pass: password});
+});
+
 // registering users
 router.post("/:id", async (req, res) => {
   try {
@@ -12,16 +22,16 @@ router.post("/:id", async (req, res) => {
       //   console.log(req.params.id);
       const passwordfor = await req.body.passwordfor;
       const username = await req.body.username;
-        // log(username);
+      // log(username);
       const password = await req.body.password;
-        // log(password);
+      // log(password);
       const newUserPass = new PasswordField({
         passwordfor: passwordfor,
         username: username,
         password: password,
         whose: user.loginusername,
       });
-        // log(newUserPass);
+      // log(newUserPass);
       try {
         const newData = await newUserPass.save();
         log(newData);
@@ -34,6 +44,5 @@ router.post("/:id", async (req, res) => {
     res.status(500).json(error);
   }
 });
-
 
 module.exports = router;
