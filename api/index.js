@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
+const displayRoute = require("./routes/displaypasswords")
 const passRoute = require("./routes/passwords");
 dotenv.config();
 mongoose
@@ -22,4 +23,5 @@ app
   })
   .use("/auth", authRoute)
   .use("/users", userRoute)
+  .use("/load", displayRoute)
   .use("/passwords", passRoute);

@@ -1,14 +1,22 @@
 const router = require("express").Router();
+const { log } = require("console");
+const users = require("../models/users");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
 // registering users
 router.post("/register", async (req, res) => {
   try {
+    const tempuser = await User.findOne({
+      loginusername: req.body.loginusername,
+    });
+    if (tempuser) {
+      res.status(400).json("User Exists");
+    }
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const hashedPassword = await bcrypt.hash(req.body.loginpassword, salt);
     const newUser = new User({
-      username: req.body.username,
-      password: hashedPassword,
+      loginusername: req.body.loginusername,
+      loginpassword: hashedPassword,
     });
     const user = await newUser.save();
     res.status(200).json(user);
@@ -19,12 +27,12 @@ router.post("/register", async (req, res) => {
 // logging user in
 router.post("/login", async (req, res) => {
   try {
-    if ((req.body.username && req.body.password) != "") {
-      const user = await User.findOne({ username: req.body.username });
+    if ((req.body.loginusername && req.body.loginpassword) != "") {
+      const user = await User.findOne({ loginusername: req.body.loginusername });
       if (!user) {
         res.status(400).json("Wrong Credentials");
       } else {
-        const match = await bcrypt.compare(req.body.password, user.password);
+        const match = await bcrypt.compare(req.body.loginpassword, user.loginpassword);
         if (!match) {
           res.status(400).json("Wrong Credentials");
         } else {
@@ -38,5 +46,6 @@ router.post("/login", async (req, res) => {
     res.json(error);
   }
 });
+
 
 module.exports = router;
